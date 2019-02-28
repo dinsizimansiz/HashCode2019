@@ -1,3 +1,6 @@
+from sys import stdout
+
+
 class Slide:
 
     def __init__(self,photos):
@@ -24,3 +27,15 @@ class Slide:
         otherTags = otherTags - intersection
         
         return min(len(intersection),len(thisTags),len(otherTags))
+
+    
+    @staticmethod
+    def printSlides(slides,filename=stdout):
+
+
+        print(len(slides),file=filename)
+        for curSlide in slides:
+            for photo in curSlide.photos:
+                print(photo.id,file=filename,end=" ")
+            print()
+        
