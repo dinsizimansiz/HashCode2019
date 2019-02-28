@@ -17,6 +17,9 @@ class Slide:
         
         return unionOfSets
 
+    def isVertical(self):
+        return len(self.photos) == 2
+
     def getInterest(self,other):
         
         thisTags = self.getTags()
