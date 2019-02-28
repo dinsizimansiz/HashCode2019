@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-from Photo import Photo
-from Slide import Slide
-
 import sys
 import os
 
+
+from util import Photo, Slide
 
 
 def combineVertical(photos):
@@ -30,7 +29,8 @@ def combineVertical(photos):
             pairMatrix[i][j] = getNumberOfTags(vertLists[i], vertLists[j])
     return (vertLists,pairMatrix)
 
-def createMaxPair(photos,verticalPhotos,pairMatrix):
+
+def createMaxPair(verticalPhotos,pairMatrix):
     used_photos = []
     for i in range(len(verticalPhotos)):
         used_photos.append(False)
@@ -49,7 +49,7 @@ def createMaxPair(photos,verticalPhotos,pairMatrix):
                     maxNumber = pairMatrix[i][j]
                     x = i
                     y = j
-        verticalPairs.append(Slide([verticalPhotos[x],verticalPhotos[y]]))
+        verticalPairs.append(Slide([verticalPhotos[x], verticalPhotos[y]]))
         used_photos[x] = True
         used_photos[y] = True
         flag_number = 0
@@ -72,6 +72,7 @@ def getNumberOfTags(p1, p2):
             tags.append(p2.tags[i])
     return len(tags)
 
+
 def printPairs(matrix):
     for i in range(len(matrix)):
         for j in range(len(matrix)):
@@ -79,9 +80,7 @@ def printPairs(matrix):
         print()
 
 
-
 def getInterestMatrix(slides):
-
     interestMatrix = []
     for i in range(len(slides)):
         interestMatrix.append([])
@@ -92,8 +91,8 @@ def getInterestMatrix(slides):
             interestMatrix[i][j] = slides[i].getInterest(slides[j])
     return interestMatrix
 
-def generateSlides(photos) -> [Slide]:
 
+def generateSlides(photos) -> [Slide]:
     slides = []
     (verticalPhotos,pairMatrix) = combineVertical(photos)
     if verticalPhotos != []:
@@ -139,21 +138,20 @@ def generateSlides(photos) -> [Slide]:
     #return  verticalSlides + horizontalSlides
     return slides
 
+
 def main():
-
-    inputs = [ os.path.join(".","inputs",path) for path in os.listdir("./inputs")]
+    inputs = [os.path.join(".", "inputs", path) for path in os.listdir("./inputs")]
     outputs = []
-    for inp in inputs :
-        outputs.append(os.path.join(".","outputs",os.path.basename(inp)))
-    
+    for inp in inputs:
+        outputs.append(os.path.join(".", "outputs", os.path.basename(inp)))
 
-    for inp,out in zip(inputs,outputs):
+    for inp, out in zip(inputs, outputs):
         photos = Photo.takeInput(inp)
         
         print("Processing:", inp)
         slides = generateSlides(photos)
-        Slide.printSlides(slides,filename=open(out,"w"))
+        Slide.printSlides(slides, filename=open(out, "w"))
+
 
 if __name__ == "__main__":
-    
     main()
