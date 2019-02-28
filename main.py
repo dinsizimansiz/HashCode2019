@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from Photo import Photo
 from Slide import Slide
 
@@ -11,6 +13,10 @@ def combineVertical(photos):
     for i in range(len(photos)):
         if not photos[i].horizonality:
             vertLists.append(photos[i])
+            if len(vertLists) == 2000:
+                break
+    if len(vertLists) == 0:
+        return ([],[])
     pairMatrix = []
     for i in range(len(vertLists)):
         temp = []
@@ -69,33 +75,69 @@ def getNumberOfTags(p1, p2):
 def printPairs(matrix):
     for i in range(len(matrix)):
         for j in range(len(matrix)):
-            sys.stdout.write(str(matrix[i][j])+ " ")
-        print ()
+            sys.stdout.write(str(matrix[i][j]) + " ")
+        print()
 
 
 
 def getInterestMatrix(slides):
 
     interestMatrix = []
-    
-    for i,_ in enumerate(slides):
-        slides.append([])
-        for j in range(i):
-            slides[i][j] = slides[i].getInterest(slides[j])
-
+    for i in range(len(slides)):
+        interestMatrix.append([])
+        for j in range(len(slides)):
+            interestMatrix[i].append(-1)
+    for i in range(len(slides)):
+        for j in range(i+1,len(slides)):
+            interestMatrix[i][j] = slides[i].getInterest(slides[j])
     return interestMatrix
 
 def generateSlides(photos) -> [Slide]:
 
     slides = []
     (verticalPhotos,pairMatrix) = combineVertical(photos)
-    verticalSlides = createMaxPair(photos,verticalPhotos,pairMatrix)
-    horitzonalSlides = list(map(lambda photo : Slide(photo),filter(lambda x : x.horizonality ,photos)))
-    #interestMatrix = getInterestMatrix(horitzonalSlides + verticalSlides)
+    if verticalPhotos != []:
+        verticalSlides = createMaxPair(photos,verticalPhotos,pairMatrix)
+    else:
+        verticalSlides = []
+    horizontalSlides = list(map(lambda photo : Slide(photo),filter(lambda x : x.horizonality ,photos)))
+    tempSlides = horizontalSlides[0:6000] + verticalSlides
+    interestMatrix = getInterestMatrix(tempSlides)
+    array = [False for i in range(len(tempSlides))]
+    count = len(tempSlides)
+    x = -1
+    y = -1
+    maxNumber = -1
+    for i in range(len(tempSlides)):
+        for j in range(len(tempSlides)):
+            if(interestMatrix[i][j] > maxNumber):
+                x = i
+                y = j
+                maxNumber = interestMatrix[i][j]
+    interestMatrix[x][y] = -1
+    count -= 2
+    slides.append(tempSlides[x])
+    slides.append(tempSlides[y])
+    array[x] = True
+    array[y] = True
+    while(count):
+        maxNumber = -1
+        newX = -1
+        newY = -1
+        for i in range(len(interestMatrix)):
+            if(interestMatrix[i][y] > maxNumber and not array[i]):
+                maxNumber = interestMatrix[i][y]
+                newX = i
+                newY = y
+        y = newX
+        # print(interestMatrix[newX][newY])
+        interestMatrix[newX][newY] = -1
+        array[newX] = True
+        slides.append(tempSlides[newX])
+        count -= 1
 
-
-    return  verticalSlides + horitzonalSlides
-    #return slides 
+    #return  verticalSlides + horizontalSlides
+    return slides
 
 def main():
 
@@ -108,7 +150,7 @@ def main():
     for inp,out in zip(inputs,outputs):
         photos = Photo.takeInput(inp)
         
-
+        print("Processing:", inp)
         slides = generateSlides(photos)
         Slide.printSlides(slides,filename=open(out,"w"))
 
