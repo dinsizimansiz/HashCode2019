@@ -40,5 +40,4 @@ class Slide:
         for curSlide in slides:
             for photo in curSlide.photos:
                 print(photo.id,file=filename,end=" ")
-            print()
-        
+            print(file=filename)        
